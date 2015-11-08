@@ -2,8 +2,10 @@
 
 #include "ofMain.h"
 #include "ofxGui.h"
-#include "ofxSyphon.h"
+//#include "ofxSyphon.h"
 #include "ofxJSON.h"
+#include "ofxOpenCv.h"
+#include "ofxKinect.h"
 
 class ofApp : public ofBaseApp{
 
@@ -44,13 +46,30 @@ class ofApp : public ofBaseApp{
         float soundLevel;
     
         ofxToggle automate;
-        
-//        ofxSyphonServer mainOutputSyphonServer;
-//        ofxSyphonServer individualTextureSyphonServer;
-    
-//        ofxSyphonClient mClient;
     
         ofxJSONElement json;
+    
+    
+        // *** kinect ***
+        ofxKinect kinect;
+    
+        ofxCvColorImage colorImg;
+        
+        ofxCvGrayscaleImage grayImage; // grayscale depth image
+        ofxCvGrayscaleImage grayThreshNear; // the near thresholded image
+        ofxCvGrayscaleImage grayThreshFar; // the far thresholded image
+        
+        ofxCvContourFinder contourFinder;
+        
+//        bool bThreshWithOpenCV;
+//        bool bDrawPointCloud;
+    
+        int nearThreshold;
+        int farThreshold;
+        
+        int angle;
+    
+        //*****************//
     
         void setup();
 		void update();
@@ -59,6 +78,7 @@ class ofApp : public ofBaseApp{
 
         void draw2d();
         void draw3d();
+        void drawPointCloud();
     
 		void keyPressed(int key);
 		void keyReleased(int key);

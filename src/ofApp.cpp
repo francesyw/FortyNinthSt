@@ -53,9 +53,30 @@ void ofApp::setup(){
     soundLevel = 0;
     ofSoundStreamSetup( 0, 1, 44100, 128, 4 );
     
-    // *** syphon ***
-//    mClient.setup();
-//    mClient.set("","EpocCam Viewer Pro");
+    
+    // *** kinect ***
+    kinect.setRegistration(true);
+    kinect.init(false, false); // disable video image (faster fps)
+    kinect.open();
+    
+    if(kinect.isConnected()) {
+        ofLogNotice() << "sensor-emitter dist: " << kinect.getSensorEmitterDistance() << "cm";
+        ofLogNotice() << "sensor-camera dist:  " << kinect.getSensorCameraDistance() << "cm";
+        ofLogNotice() << "zero plane pixel size: " << kinect.getZeroPlanePixelSize() << "mm";
+        ofLogNotice() << "zero plane dist: " << kinect.getZeroPlaneDistance() << "mm";
+    }
+    
+    colorImg.allocate(kinect.width, kinect.height);
+    grayImage.allocate(kinect.width, kinect.height);
+    grayThreshNear.allocate(kinect.width, kinect.height);
+    grayThreshFar.allocate(kinect.width, kinect.height);
+    
+    nearThreshold = 230;
+    farThreshold = 70;
+//    bThreshWithOpenCV = true;
+    angle = 0;
+    kinect.setCameraTiltAngle(angle);
+    
     
     // *** video plane ***
     
@@ -121,7 +142,30 @@ void ofApp::update(){
         extrude = extrude + 0.1 * (newExtrude-extrude);
 //        float newRad = ofMap( level, 0, 1, 100, 300, true );
 //        rad = rad + 0.5 * (newRad-rad);
+    }
+    
+    
+    // *** kinect ***
+    kinect.update();
+    if(kinect.isFrameNew()) {
         
+        // load grayscale depth image from the kinect source
+        grayImage.setFromPixels(kinect.getDepthPixels(), kinect.width, kinect.height);
+        
+        // we do two thresholds - one for the far plane and one for the near plane
+        // we then do a cvAnd to get the pixels which are a union of the two thresholds
+        grayThreshNear = grayImage;
+        grayThreshFar = grayImage;
+        grayThreshNear.threshold(nearThreshold, true);
+        grayThreshFar.threshold(farThreshold);
+        cvAnd(grayThreshNear.getCvImage(), grayThreshFar.getCvImage(), grayImage.getCvImage(), NULL);
+        
+        // update the cv images
+        grayImage.flagImageChanged();
+        
+        // find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
+        // also, find holes is set to true so we will get interior contours as well....
+//        contourFinder.findContours(grayImage, 10, (kinect.width*kinect.height)/2, 20, false);
     }
 }
 
@@ -168,6 +212,8 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::exit(){
     gui.saveToFile( "settings.xml" );
+    kinect.setCameraTiltAngle(0); // zero the tilt on exit
+    kinect.close();
 }
 
 
@@ -194,7 +240,7 @@ void ofApp::draw3d() {
 //    light.setPosition(ofGetWidth()/2, ofGetHeight()/2, 600);
 //    light.enable();
 //    material.begin();
-    ofEnableDepthTest();
+//    ofEnableDepthTest();
     
     cam.begin();
 //    cam.enableOrtho();
@@ -211,16 +257,43 @@ void ofApp::draw3d() {
     
 //    ofSetColor( ofColor::white );
 //    videoPlane.drawWireframe();
-
+    drawPointCloud();
     cam.end();
     
-    ofDisableDepthTest();
+//    ofDisableDepthTest();
 //    material.end();
 //    light.disable();
 //    ofDisableLighting();
     
 //    fbo2.getTextureReference().unbind();
 }
+
+//**************************************************************
+void ofApp::drawPointCloud() {
+    int w = 640;
+    int h = 480;
+    ofMesh mesh;
+    mesh.setMode(OF_PRIMITIVE_POINTS);
+    int step = 3;
+    for(int y = 0; y < h; y += step) {
+        for(int x = 0; x < w; x += step) {
+            if(kinect.getDistanceAt(x, y) > 0) {
+                mesh.addColor(kinect.getColorAt(x,y));
+                mesh.addVertex(kinect.getWorldCoordinateAt(x, y));
+            }
+        }
+    }
+    glPointSize(1);
+    ofPushMatrix();
+    // the projected points are 'upside down' and 'backwards'
+    ofScale(1, -1, -1);
+    ofTranslate(0, 0, -1000); // center the points a bit
+    ofEnableDepthTest();
+    mesh.drawVertices();
+    ofDisableDepthTest();
+    ofPopMatrix();
+}
+
 
 //**************************************************************
 void ofApp::audioIn(float *input, int bufferSize, int nChannels){
@@ -253,11 +326,81 @@ void ofApp::keyPressed(int key){
         res = ofSystemLoadDialog( "Loading Preset" );
         if ( res.bSuccess ) gui.loadFromFile( res.filePath );
     }
-//    if ( key == 'c' ) {
-//        camera.setDeviceID( 0 );
-//        camera.setDesiredFrameRate( 30 );
-//        camera.initGrabber( 1280, 720 );
-//    }
+    
+    switch (key) {
+        case '>':
+        case '.':
+            farThreshold ++;
+            if (farThreshold > 255) farThreshold = 255;
+            break;
+            
+        case '<':
+        case ',':
+            farThreshold --;
+            if (farThreshold < 0) farThreshold = 0;
+            break;
+            
+        case '+':
+        case '=':
+            nearThreshold ++;
+            if (nearThreshold > 255) nearThreshold = 255;
+            break;
+            
+        case '-':
+            nearThreshold --;
+            if (nearThreshold < 0) nearThreshold = 0;
+            break;
+            
+        case 'w':
+            kinect.enableDepthNearValueWhite(!kinect.isDepthNearValueWhite());
+            break;
+            
+        case 'o':
+            kinect.setCameraTiltAngle(angle); // go back to prev tilt
+            kinect.open();
+            break;
+            
+        case 'c':
+            kinect.setCameraTiltAngle(0); // zero the tilt
+            kinect.close();
+            break;
+            
+        case '1':
+            kinect.setLed(ofxKinect::LED_GREEN);
+            break;
+            
+        case '2':
+            kinect.setLed(ofxKinect::LED_YELLOW);
+            break;
+            
+        case '3':
+            kinect.setLed(ofxKinect::LED_RED);
+            break;
+            
+        case '4':
+            kinect.setLed(ofxKinect::LED_BLINK_GREEN);
+            break;
+            
+        case '5':
+            kinect.setLed(ofxKinect::LED_BLINK_YELLOW_RED);
+            break;
+            
+        case '0':
+            kinect.setLed(ofxKinect::LED_OFF);
+            break;
+            
+        case OF_KEY_UP:
+            angle++;
+            if(angle>30) angle=30;
+            kinect.setCameraTiltAngle(angle);
+            break;
+            
+        case OF_KEY_DOWN:
+            angle--;
+            if(angle<-30) angle=-30;
+            kinect.setCameraTiltAngle(angle);
+            break;
+    }
 }
 
 //--------------------------------------------------------------
