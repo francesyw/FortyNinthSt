@@ -5,7 +5,7 @@
 <Parameters/>
 <Global>
 		<Scale>0</Scale>
-		<Rotate>0</Rotate>
+		<Rotate>-180</Rotate>
 		<Background>0</Background>
 	</Global>
 <Primitive>
@@ -22,19 +22,19 @@
 	<pinchY>0</pinchY>
 <Mixer>
 		<image>0</image>
-		<video>255</video>
+		<video>0</video>
 		<camera>0</camera>
 	<kenabled>0</kenabled>
 		<ksectors>7</ksectors>
 		<kangle>-93.6735</kangle>
 		<kx>0.502094</kx>
 		<ky>0.132653</ky>
-	<show2d>255</show2d>
+	<show2d>0</show2d>
 		<show3d>255</show3d>
-	<rad>188.776</rad>
-		<deform>0</deform>
-		<deformFreq>1.27551</deformFreq>
-		<extrude>0</extrude>
+	<rad>2</rad>
+		<deform>0.0430311</deform>
+		<deformFreq>8.68587</deformFreq>
+		<extrude>53.2116</extrude>
 	<automate>0</automate>
 	</Mixer>
 </Parameters>

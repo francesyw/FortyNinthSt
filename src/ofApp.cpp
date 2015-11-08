@@ -10,7 +10,7 @@ void ofApp::setup(){
     ofSetWindowTitle( "49th St" );
     ofSetWindowShape( 1920, 1080 );
     ofSetFrameRate( 60 );
-    ofBackground( ofColor::white );
+    ofBackground( ofColor::grey );
 
     gui.setup( "Parameters", "settings.xml" );
     
@@ -27,7 +27,7 @@ void ofApp::setup(){
 //    mixerGroup.add( cameraAlpha.setup( "camera", 100,0,255 ) );
     mixerGroup.add( show2d.setup("show2d", 255, 0, 255) );
     mixerGroup.add( show3d.setup("show3d", 255, 0, 255) );
-    mixerGroup.add( rad.setup("rad", 250, 0, 500) );
+    mixerGroup.add( rad.setup("rad", 1, 1, 7) );
     mixerGroup.add( deform.setup("deform", 0.3, 0, 1.5) );
     mixerGroup.add( deformFreq.setup("deformFreq", 3, 0, 10) );
     mixerGroup.add( extrude.setup("extrude", 0, 0, 300 ) );
@@ -56,7 +56,7 @@ void ofApp::setup(){
     
     // *** kinect ***
     kinect.setRegistration(true);
-    kinect.init(false, false); // disable video image (faster fps)
+    kinect.init();
     kinect.open();
     
     if(kinect.isConnected()) {
@@ -138,10 +138,10 @@ void ofApp::update(){
         double level = 0;
         level += (soundLevel*2);
 //        cout << level << endl;
-        float newExtrude = ofMap(level, 0, 0.3, 50, 300, true);
-        extrude = extrude + 0.1 * (newExtrude-extrude);
-//        float newRad = ofMap( level, 0, 1, 100, 300, true );
-//        rad = rad + 0.5 * (newRad-rad);
+//        float newExtrude = ofMap(level, 0, 0.3, 50, 300, true);
+//        extrude = extrude + 0.1 * (newExtrude-extrude);
+        float newRad = ofMap( level, 0, 0.02, 1, 7, true );
+        rad = floor(rad + 0.3 * (newRad-rad));
     }
     
     
@@ -171,6 +171,11 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+    ofBackground( Background );
+//    ofSetColor(255, 255, 255);
+//    kinect.draw(0, 0, ofGetWidth(), ofGetHeight());
+//    draw3d();
+    
 //    fbo.begin();
 //    draw2d();
 //    fbo.end();
@@ -181,17 +186,18 @@ void ofApp::draw(){
 //    fbo2.end();
     
     fbo3d.begin();
+    ofClear(255,255,255, 0);
     draw3d();
     fbo3d.end();
     
-    ofBackground( 255 );
 //    ofSetColor( 255, show2d );
 //    fbo2.draw( 0, 0 );
-    ofSetColor( 255, show3d );
-    fbo3d.draw( 0, 0 );
     
-//    ofSetColor( 255 );
-//    ofDrawBitmapString( ofToString( ofGetFrameRate() ), 250, 20 );
+    ofSetColor( 255, show3d );
+    fbo3d.draw( 0, 0, ofGetWidth(), ofGetHeight() );
+    
+    ofSetColor( 0 );
+    ofDrawBitmapString( ofToString( ofGetFrameRate() ), 250, 20 );
     
     // json test
 //    ofSetColor(255);
@@ -237,26 +243,16 @@ void ofApp::draw2d() {
 void ofApp::draw3d() {
 //    fbo2.getTextureReference().bind();
     
-//    light.setPosition(ofGetWidth()/2, ofGetHeight()/2, 600);
+//    light.setPosition(ofGetWidth()/2, ofGetHeight()/2, 300);
 //    light.enable();
 //    material.begin();
 //    ofEnableDepthTest();
     
     cam.begin();
-//    cam.enableOrtho();
-//    light.setPosition(0, 0, 600);
-//    light.enable();
-//    light.draw();
-    
-      /* camera movement */
-//    float time = ofGetElapsedTimef();
-//    float longitude = 10*time;
-//    float latitude = 10*sin(time*0.8);
-//    float radius = 600 + 50*sin(time*0.4);
-//    cam.orbit( longitude, latitude, radius, ofPoint(0,0,0) );
-    
 //    ofSetColor( ofColor::white );
 //    videoPlane.drawWireframe();
+    
+    ofSetColor(255, 255, 255);
     drawPointCloud();
     cam.end();
     
@@ -274,15 +270,17 @@ void ofApp::drawPointCloud() {
     int h = 480;
     ofMesh mesh;
     mesh.setMode(OF_PRIMITIVE_POINTS);
-    int step = 3;
+    int step = 2;
     for(int y = 0; y < h; y += step) {
         for(int x = 0; x < w; x += step) {
             if(kinect.getDistanceAt(x, y) > 0) {
-                mesh.addColor(kinect.getColorAt(x,y));
+                mesh.addColor(ofColor::green);
+//                mesh.addColor(kinect.getColorAt(x,y));
                 mesh.addVertex(kinect.getWorldCoordinateAt(x, y));
             }
         }
     }
+
     glPointSize(1);
     ofPushMatrix();
     // the projected points are 'upside down' and 'backwards'
