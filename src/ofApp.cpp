@@ -39,14 +39,14 @@ void ofApp::setup(){
     
     fbo.allocate( screenWidth, screenHeight, GL_RGB );
     
-//    videoPlane.set(screenWidth, screenHeight);
-//    videoPlane.setResolution(100, 100);
-//    vertices0 = videoPlane.getMesh().getVertices();
+    videoPlane.set(screenWidth, screenHeight);
+    videoPlane.setResolution(80, 60);
+    vertices0 = videoPlane.getMesh().getVertices();
     fbo2.allocate( screenWidth, screenHeight, GL_RGB );
-//    float w = fbo2.getWidth();
-//    float h = fbo2.getHeight();
-//    videoPlane.mapTexCoords(0, h, w, 0);
-//    videoPlane.rotate(0, 0, 1, 0);
+    float w = fbo2.getWidth();
+    float h = fbo2.getHeight();
+    videoPlane.mapTexCoords(0, h, w, 0);
+    videoPlane.rotate(0, 0, 1, 0);
     
     fbo3d.allocate( screenWidth, screenHeight, GL_RGBA );
     
@@ -66,10 +66,10 @@ void ofApp::setup(){
         ofLogNotice() << "zero plane dist: " << kinect.getZeroPlaneDistance() << "mm";
     }
     
-    colorImg.allocate(kinect.width, kinect.height);
-    grayImage.allocate(kinect.width, kinect.height);
-    grayThreshNear.allocate(kinect.width, kinect.height);
-    grayThreshFar.allocate(kinect.width, kinect.height);
+//    colorImg.allocate(kinect.width, kinect.height);
+//    grayImage.allocate(kinect.width, kinect.height);
+//    grayThreshNear.allocate(kinect.width, kinect.height);
+//    grayThreshFar.allocate(kinect.width, kinect.height);
     
     nearThreshold = 230;
     farThreshold = 70;
@@ -98,7 +98,7 @@ void ofApp::update(){
 //    video.update();
 //    if ( camera.isInitialized() ) camera.update();
     
-//    vector<ofPoint> &vertices = videoPlane.getMesh().getVertices();
+    vector<ofPoint> &vertices = videoPlane.getMesh().getVertices();
 //    for (int i=0; i<vertices.size(); i++) {
 //        ofPoint v = vertices0[i];
 //        v.normalize();
@@ -112,15 +112,15 @@ void ofApp::update(){
 //        vertices[i] = v;
 //    }
     
-//    ofPixels pixels;
-//    fbo2.readToPixels(pixels);
-//    for (int i=0; i<vertices.size(); i++) {
-//        ofVec2f t = videoPlane.getMesh().getTexCoords()[i];
-//        t.x = ofClamp( t.x, 0, pixels.getWidth()-1 );
-//        t.y = ofClamp( t.y, 0, pixels.getHeight()-1 );
-//        float br = pixels.getColor(t.x, t.y).getBrightness();
-//        vertices[i] = vertices0[i] + br / 255.0 * extrude;
-//    }
+    ofPixels pixels;
+    fbo2.readToPixels(pixels);
+    for (int i=0; i<vertices.size(); i++) {
+        ofVec2f t = videoPlane.getMesh().getTexCoords()[i];
+        t.x = ofClamp( t.x, 0, pixels.getWidth()-1 );
+        t.y = ofClamp( t.y, 0, pixels.getHeight()-1 );
+        float br = pixels.getColor(t.x, t.y).getBrightness();
+        vertices[i] = vertices0[i] + br / 255.0 * extrude;
+    }
     
     if ( automate ) {
         /* automation */
@@ -138,52 +138,54 @@ void ofApp::update(){
         double level = 0;
         level += (soundLevel*2);
 //        cout << level << endl;
-//        float newExtrude = ofMap(level, 0, 0.3, 50, 300, true);
-//        extrude = extrude + 0.1 * (newExtrude-extrude);
-        float newRad = ofMap( level, 0, 0.02, 1, 7, true );
-        rad = floor(rad + 0.3 * (newRad-rad));
+        float newExtrude = ofMap(level, 0, 0.3, 50, 300, true);
+        extrude = extrude + 0.1 * (newExtrude-extrude);
+//        float newRad = ofMap( level, 0, 0.02, 1, 7, true );
+//        rad = floor(rad + 0.3 * (newRad-rad));
     }
     
     
     // *** kinect ***
     kinect.update();
-    if(kinect.isFrameNew()) {
-        
-        // load grayscale depth image from the kinect source
-        grayImage.setFromPixels(kinect.getDepthPixels(), kinect.width, kinect.height);
-        
-        // we do two thresholds - one for the far plane and one for the near plane
-        // we then do a cvAnd to get the pixels which are a union of the two thresholds
-        grayThreshNear = grayImage;
-        grayThreshFar = grayImage;
-        grayThreshNear.threshold(nearThreshold, true);
-        grayThreshFar.threshold(farThreshold);
-        cvAnd(grayThreshNear.getCvImage(), grayThreshFar.getCvImage(), grayImage.getCvImage(), NULL);
-        
-        // update the cv images
-        grayImage.flagImageChanged();
-        
-        // find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
-        // also, find holes is set to true so we will get interior contours as well....
-//        contourFinder.findContours(grayImage, 10, (kinect.width*kinect.height)/2, 20, false);
-    }
+//    if(kinect.isFrameNew()) {
+//        
+//        // load grayscale depth image from the kinect source
+//        grayImage.setFromPixels(kinect.getDepthPixels(), kinect.width, kinect.height);
+//        
+//        // we do two thresholds - one for the far plane and one for the near plane
+//        // we then do a cvAnd to get the pixels which are a union of the two thresholds
+//        grayThreshNear = grayImage;
+//        grayThreshFar = grayImage;
+//        grayThreshNear.threshold(nearThreshold, true);
+//        grayThreshFar.threshold(farThreshold);
+//        cvAnd(grayThreshNear.getCvImage(), grayThreshFar.getCvImage(), grayImage.getCvImage(), NULL);
+//        
+//        // update the cv images
+//        grayImage.flagImageChanged();
+//        
+//        // find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
+//        // also, find holes is set to true so we will get interior contours as well....
+////        contourFinder.findContours(grayImage, 10, (kinect.width*kinect.height)/2, 20, false);
+//    }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
     ofBackground( Background );
-//    ofSetColor(255, 255, 255);
+    ofSetColor(255, 255, 255);
 //    kinect.draw(0, 0, ofGetWidth(), ofGetHeight());
 //    draw3d();
     
-//    fbo.begin();
-//    draw2d();
-//    fbo.end();
+    fbo.begin();
+    ofClear(255,255,255, 0);
+    draw2d();
+    fbo.end();
     
-//    ofSetColor( 255 );
-//    fbo2.begin();
-//    fbo.draw( 0, 0, ofGetWidth(), ofGetHeight() );
-//    fbo2.end();
+    ofSetColor( 255 );
+    fbo2.begin();
+    ofClear(255,255,255, 0);
+    fbo.draw( 0, 0, ofGetWidth(), ofGetHeight() );
+    fbo2.end();
     
     fbo3d.begin();
     ofClear(255,255,255, 0);
@@ -196,7 +198,7 @@ void ofApp::draw(){
     ofSetColor( 255, show3d );
     fbo3d.draw( 0, 0, ofGetWidth(), ofGetHeight() );
     
-    ofSetColor( 0 );
+    ofSetColor( 255 );
     ofDrawBitmapString( ofToString( ofGetFrameRate() ), 250, 20 );
     
     // json test
@@ -225,71 +227,40 @@ void ofApp::exit(){
 
 //**************************************************************
 void ofApp::draw2d() {
-    ofBackground( Background );
+//    ofBackground( Background );
     
-    ofDisableSmoothing();
-    ofEnableBlendMode( OF_BLENDMODE_ADD );
+//    ofDisableSmoothing();
+//    ofEnableBlendMode( OF_BLENDMODE_ADD );
 //    ofSetColor( 255, videoAlpha );
-//    mClient.draw( 0, 0, ofGetWidth(), ofGetHeight() );
+    kinect.draw( 0, 0, ofGetWidth(), ofGetHeight() );
 //    if ( camera.isInitialized() ) {
 //        ofSetColor( 255, cameraAlpha );
 //        camera.draw( 0, 0, ofGetWidth(), ofGetHeight() );
 //    }
-    ofEnableAlphaBlending();
-    ofEnableSmoothing();
+//    ofEnableAlphaBlending();
+//    ofEnableSmoothing();
 }
 
 //**************************************************************
 void ofApp::draw3d() {
-//    fbo2.getTextureReference().bind();
+    fbo2.getTextureReference().bind();
     
-//    light.setPosition(ofGetWidth()/2, ofGetHeight()/2, 300);
-//    light.enable();
-//    material.begin();
-//    ofEnableDepthTest();
+    light.setPosition(ofGetWidth()/2, ofGetHeight()/2, 600);
+    light.enable();
+    material.begin();
+    ofEnableDepthTest();
     
     cam.begin();
-//    ofSetColor( ofColor::white );
-//    videoPlane.drawWireframe();
-    
-    ofSetColor(255, 255, 255);
-    drawPointCloud();
+    ofSetColor( ofColor::white );
+    videoPlane.drawWireframe();
     cam.end();
     
-//    ofDisableDepthTest();
-//    material.end();
-//    light.disable();
-//    ofDisableLighting();
-    
-//    fbo2.getTextureReference().unbind();
-}
-
-//**************************************************************
-void ofApp::drawPointCloud() {
-    int w = 640;
-    int h = 480;
-    ofMesh mesh;
-    mesh.setMode(OF_PRIMITIVE_POINTS);
-    int step = 2;
-    for(int y = 0; y < h; y += step) {
-        for(int x = 0; x < w; x += step) {
-            if(kinect.getDistanceAt(x, y) > 0) {
-                mesh.addColor(ofColor::green);
-//                mesh.addColor(kinect.getColorAt(x,y));
-                mesh.addVertex(kinect.getWorldCoordinateAt(x, y));
-            }
-        }
-    }
-
-    glPointSize(1);
-    ofPushMatrix();
-    // the projected points are 'upside down' and 'backwards'
-    ofScale(1, -1, -1);
-    ofTranslate(0, 0, -1000); // center the points a bit
-    ofEnableDepthTest();
-    mesh.drawVertices();
     ofDisableDepthTest();
-    ofPopMatrix();
+    material.end();
+    light.disable();
+    ofDisableLighting();
+    
+    fbo2.getTextureReference().unbind();
 }
 
 
