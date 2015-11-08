@@ -27,14 +27,14 @@
 	<kenabled>0</kenabled>
 		<ksectors>7</ksectors>
 		<kangle>-93.6735</kangle>
-		<kx>0.549778</kx>
+		<kx>0.502094</kx>
 		<ky>0.132653</ky>
-	<show2d>0</show2d>
+	<show2d>255</show2d>
 		<show3d>255</show3d>
-	<rad>99.4898</rad>
-		<deform>0.0454773</deform>
-		<deformFreq>5.99254</deformFreq>
-		<extrude>53.2723</extrude>
-	<automate>1</automate>
+	<rad>188.776</rad>
+		<deform>0</deform>
+		<deformFreq>1.27551</deformFreq>
+		<extrude>0</extrude>
+	<automate>0</automate>
 	</Mixer>
 </Parameters>

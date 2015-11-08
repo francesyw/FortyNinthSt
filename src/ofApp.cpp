@@ -1,8 +1,5 @@
 #include "ofApp.h"
 
-int W = 100;		//Grid size
-int H = 100;
-
 //--------------------------------------------------------------
 void ofApp::setup(){
     showGui = true;
@@ -13,16 +10,9 @@ void ofApp::setup(){
     ofSetWindowTitle( "49th St" );
     ofSetWindowShape( 1920, 1080 );
     ofSetFrameRate( 60 );
-    ofBackground( ofColor::black );
+    ofBackground( ofColor::white );
 
     gui.setup( "Parameters", "settings.xml" );
-    gui.add( countX.setup( "countX", 50, 0, 200 ) );
-    gui.add( stepX.setup( "stepX", 20, 0, 200 ) );
-    gui.add( twistX.setup( "twistX", 5, -45, 45 ) );
-    gui.add( countY.setup( "countY", 0, 0, 50) );
-    gui.add( stepY.setup( "stepY", 20, 0, 200 ) );
-    gui.add( twistY.setup( "twistY", 0, -30, 30 ) );
-    gui.add( pinchY.setup( "pinchY", 0, 0, 1 ) );
     
     globalGroup.setup( "Global" );
     globalGroup.add( Scale.setup( "Scale", 1, 0.0, 1 ) );
@@ -30,53 +20,33 @@ void ofApp::setup(){
     globalGroup.add( Background.setup("Background",255,0, 255));
     gui.add( &globalGroup );
     
-    primGroup.setup( "Primitive" );
-    primGroup.add( shiftY.setup("shiftY",0.0,-1000.0,1000.0 ) );
-    primGroup.add( rotate.setup("rotate",0.0,-180.0,180.0 ) );
-    primGroup.add( size.setup( "size", ofVec2f(6,6), ofVec2f(0,0), ofVec2f(20,20) ) );
-    primGroup.add( color.setup( "color", ofColor::black, ofColor(1,1,0,0), ofColor::white ) );
-    primGroup.add( filled.setup( "filled", false ) );
-    primGroup.add( type.setup( "type", false ) );
-    gui.add( &primGroup );
-    
     mixerGroup.setup( "Mixer" );
     mixerGroup.setHeaderBackgroundColor( ofColor::darkRed );
     mixerGroup.setBorderColor( ofColor::darkRed );
-    mixerGroup.add( imageAlpha.setup( "image", 100,0,255 ) );
     mixerGroup.add( videoAlpha.setup( "video", 200,0,255 ) );
 //    mixerGroup.add( cameraAlpha.setup( "camera", 100,0,255 ) );
-    shader.load( "kaleido" );
-    mixerGroup.add( kenabled.setup( "kenabled", true ) );
-    mixerGroup.add( ksectors.setup( "ksectors", 10, 1, 100 ) );
-    mixerGroup.add( kangle.setup( "kangle", 0, -180, 180 ) );
-    mixerGroup.add( kx.setup( "kx", 0.5, 0, 1 ) );
-    mixerGroup.add( ky.setup( "ky", 0.5, 0, 1 ) );
     mixerGroup.add( show2d.setup("show2d", 255, 0, 255) );
     mixerGroup.add( show3d.setup("show3d", 255, 0, 255) );
     mixerGroup.add( rad.setup("rad", 250, 0, 500) );
     mixerGroup.add( deform.setup("deform", 0.3, 0, 1.5) );
     mixerGroup.add( deformFreq.setup("deformFreq", 3, 0, 10) );
     mixerGroup.add( extrude.setup("extrude", 0, 0, 300 ) );
-    mixerGroup.add( automate.setup( "automate", true ) );
+    mixerGroup.add( automate.setup( "automate", false ) );
     gui.minimizeAll();
     gui.add( &mixerGroup );
     
     gui.loadFromFile( "settings.xml" );
     
-    ofLoadImage( image, "collage.png" );
-//    video.loadMovie( "flowing.mp4" );
-//    video.play();
-    
     fbo.allocate( screenWidth, screenHeight, GL_RGB );
     
-    videoPlane.set(screenWidth, screenHeight);
-    videoPlane.setResolution(100, 100);
-    vertices0 = videoPlane.getMesh().getVertices();
+//    videoPlane.set(screenWidth, screenHeight);
+//    videoPlane.setResolution(100, 100);
+//    vertices0 = videoPlane.getMesh().getVertices();
     fbo2.allocate( screenWidth, screenHeight, GL_RGB );
-    float w = fbo2.getWidth();
-    float h = fbo2.getHeight();
-    videoPlane.mapTexCoords(0, h, w, 0);
-    videoPlane.rotate(0, 0, 1, 0);
+//    float w = fbo2.getWidth();
+//    float h = fbo2.getHeight();
+//    videoPlane.mapTexCoords(0, h, w, 0);
+//    videoPlane.rotate(0, 0, 1, 0);
     
     fbo3d.allocate( screenWidth, screenHeight, GL_RGBA );
     
@@ -84,8 +54,8 @@ void ofApp::setup(){
     ofSoundStreamSetup( 0, 1, 44100, 128, 4 );
     
     // *** syphon ***
-    mClient.setup();
-    mClient.set("","EpocCam Viewer Pro");
+//    mClient.setup();
+//    mClient.set("","EpocCam Viewer Pro");
     
     // *** video plane ***
     
@@ -107,7 +77,7 @@ void ofApp::update(){
 //    video.update();
 //    if ( camera.isInitialized() ) camera.update();
     
-    vector<ofPoint> &vertices = videoPlane.getMesh().getVertices();
+//    vector<ofPoint> &vertices = videoPlane.getMesh().getVertices();
 //    for (int i=0; i<vertices.size(); i++) {
 //        ofPoint v = vertices0[i];
 //        v.normalize();
@@ -121,15 +91,15 @@ void ofApp::update(){
 //        vertices[i] = v;
 //    }
     
-    ofPixels pixels;
-    fbo2.readToPixels(pixels);
-    for (int i=0; i<vertices.size(); i++) {
-        ofVec2f t = videoPlane.getMesh().getTexCoords()[i];
-        t.x = ofClamp( t.x, 0, pixels.getWidth()-1 );
-        t.y = ofClamp( t.y, 0, pixels.getHeight()-1 );
-        float br = pixels.getColor(t.x, t.y).getBrightness();
-        vertices[i] = vertices0[i] + br / 255.0 * extrude;
-    }
+//    ofPixels pixels;
+//    fbo2.readToPixels(pixels);
+//    for (int i=0; i<vertices.size(); i++) {
+//        ofVec2f t = videoPlane.getMesh().getTexCoords()[i];
+//        t.x = ofClamp( t.x, 0, pixels.getWidth()-1 );
+//        t.y = ofClamp( t.y, 0, pixels.getHeight()-1 );
+//        float br = pixels.getColor(t.x, t.y).getBrightness();
+//        vertices[i] = vertices0[i] + br / 255.0 * extrude;
+//    }
     
     if ( automate ) {
         /* automation */
@@ -137,7 +107,7 @@ void ofApp::update(){
         phase += dt * frequency * M_TWO_PI;
     //    float phase = 0.1 * ofGetElapsedTimef() * M_TWO_PI;
         float value = sin( phase );
-        kx = ofMap(value, -1, 1, 0.45, 0.55);
+//        kx = ofMap(value, -1, 1, 0.45, 0.55);
         
         float phase1 = 0.1 * ofGetElapsedTimef();
         deform = ofMap(ofNoise( phase1 ), 0, 1, 0.01, 0.08);
@@ -157,31 +127,22 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    fbo.begin();
-    draw2d();
-    fbo.end();
+//    fbo.begin();
+//    draw2d();
+//    fbo.end();
     
-    ofSetColor( 255 );
-    fbo2.begin();
-    if ( kenabled ) {
-        shader.begin();
-        shader.setUniform1i( "ksectors", ksectors );
-        shader.setUniform1f( "kangleRad", ofDegToRad(kangle) );
-        shader.setUniform2f( "kcenter", kx*ofGetWidth(), ky*ofGetHeight() );
-        shader.setUniform2f( "screenCenter", 0.5*ofGetWidth(), 0.5*ofGetHeight() );
-    }
-    fbo.draw( 0, 0, ofGetWidth(), ofGetHeight() );
-    if ( kenabled ) shader.end();
-    fbo2.end();
+//    ofSetColor( 255 );
+//    fbo2.begin();
+//    fbo.draw( 0, 0, ofGetWidth(), ofGetHeight() );
+//    fbo2.end();
     
     fbo3d.begin();
-    ofBackground( 0, 0 );
     draw3d();
     fbo3d.end();
     
-    ofBackground( 0 );
-    ofSetColor( 255, show2d );
-    fbo2.draw( 0, 0 );
+    ofBackground( 255 );
+//    ofSetColor( 255, show2d );
+//    fbo2.draw( 0, 0 );
     ofSetColor( 255, show3d );
     fbo3d.draw( 0, 0 );
     
@@ -211,78 +172,28 @@ void ofApp::exit(){
 
 
 //**************************************************************
-// TODO: replace primitives with ofMesh() / ofVboMesh() / glDraw()
-void ofApp::stripePattern() {
-    ofColor baseColor = color;
-    ofSetLineWidth( 1.0 );
-    if ( filled ) ofFill();
-    else ofNoFill();
-    
-    for (int i = -countX; i < countX; i++) {
-        ofPushMatrix();
-        ofTranslate( i * stepX, 0 );
-        ofRotate( i * twistX );
-
-        ofTranslate( 0, shiftY );
-        ofRotate( rotate );
-        ofScale( size->x, size->y );
-        ofSetColor( abs(i)*3%baseColor.r, abs(i)*5%baseColor.g, baseColor.b, baseColor.a );
-        if ( type ) ofRect( -50, -50, 100, 100 );
-        else ofTriangle( 0, 0, -50, 100, 50, 100 );
-        ofPopMatrix();
-    }
-}
-
-//**************************************************************
-void ofApp::matrixPattern() {
-    for (int y = -countY; y <= countY; y++) {
-        ofPushMatrix();
-        //---------------------
-        if ( countY > 0 ) {
-            float scl = ofMap( y, -countY, countY, 1-pinchY, 1 );
-            ofScale( scl, scl );
-        }
-        ofTranslate( 0, y * stepY );
-        ofRotate( y * twistY );
-        stripePattern();
-        //---------------------
-        ofPopMatrix();
-    }
-}
-
-//**************************************************************
 void ofApp::draw2d() {
     ofBackground( Background );
     
     ofDisableSmoothing();
     ofEnableBlendMode( OF_BLENDMODE_ADD );
-    ofSetColor( 255, imageAlpha );
-    image.draw( 0, 0, ofGetWidth(), ofGetHeight() );
-    ofSetColor( 255, videoAlpha );
-    mClient.draw( 0, 0, ofGetWidth(), ofGetHeight() );
+//    ofSetColor( 255, videoAlpha );
+//    mClient.draw( 0, 0, ofGetWidth(), ofGetHeight() );
 //    if ( camera.isInitialized() ) {
 //        ofSetColor( 255, cameraAlpha );
 //        camera.draw( 0, 0, ofGetWidth(), ofGetHeight() );
 //    }
     ofEnableAlphaBlending();
     ofEnableSmoothing();
-    
-    ofPushMatrix();
-    ofTranslate( ofGetWidth() / 2, ofGetHeight() / 2 );
-    float Scl = pow( Scale, 4.0f );
-    ofScale( Scl, Scl );
-    ofRotate( Rotate );
-    matrixPattern();
-    ofPopMatrix();
 }
 
 //**************************************************************
 void ofApp::draw3d() {
-    fbo2.getTextureReference().bind();
+//    fbo2.getTextureReference().bind();
     
-    light.setPosition(ofGetWidth()/2, ofGetHeight()/2, 600);
-    light.enable();
-    material.begin();
+//    light.setPosition(ofGetWidth()/2, ofGetHeight()/2, 600);
+//    light.enable();
+//    material.begin();
     ofEnableDepthTest();
     
     cam.begin();
@@ -298,17 +209,17 @@ void ofApp::draw3d() {
 //    float radius = 600 + 50*sin(time*0.4);
 //    cam.orbit( longitude, latitude, radius, ofPoint(0,0,0) );
     
-    ofSetColor( ofColor::white );
-    videoPlane.drawWireframe();
-//    sphere.draw();
+//    ofSetColor( ofColor::white );
+//    videoPlane.drawWireframe();
+
     cam.end();
     
     ofDisableDepthTest();
-    material.end();
-    light.disable();
-    ofDisableLighting();
+//    material.end();
+//    light.disable();
+//    ofDisableLighting();
     
-    fbo2.getTextureReference().unbind();
+//    fbo2.getTextureReference().unbind();
 }
 
 //**************************************************************

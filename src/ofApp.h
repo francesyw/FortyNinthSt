@@ -11,37 +11,20 @@ class ofApp : public ofBaseApp{
         bool showGui;
         bool showfullScreen;
         ofxPanel gui;
-        ofxIntSlider countX;
-        ofxIntSlider countY;
-        ofxFloatSlider stepX;
-        ofxFloatSlider stepY, twistY, pinchY;
-        ofxFloatSlider twistX;
     
         ofxGuiGroup globalGroup;
         ofxFloatSlider Scale;
         ofxFloatSlider Rotate;
         ofxFloatSlider Background;
     
-        ofxGuiGroup primGroup;
-        ofxFloatSlider shiftY, rotate;
-        ofxVec2Slider size;
-        ofxColorSlider color;
-        ofxToggle filled, type;
-    
-        ofTexture image;
         ofVideoPlayer video;
 //        ofVideoGrabber camera;
     
         ofxGuiGroup mixerGroup;
-        ofxFloatSlider imageAlpha, videoAlpha; //, cameraAlpha;
-        ofxToggle kenabled;
-        ofxIntSlider ksectors;
-        ofxFloatSlider kangle, kx, ky;
+        ofxFloatSlider videoAlpha; //, cameraAlpha;
 
         ofFbo fbo;
-        ofShader shader;
     
-//        ofSpherePrimitive sphere;
         ofPlanePrimitive videoPlane;
         ofEasyCam cam;
         ofLight light;
@@ -62,10 +45,10 @@ class ofApp : public ofBaseApp{
     
         ofxToggle automate;
         
-        ofxSyphonServer mainOutputSyphonServer;
-        ofxSyphonServer individualTextureSyphonServer;
-        
-        ofxSyphonClient mClient;
+//        ofxSyphonServer mainOutputSyphonServer;
+//        ofxSyphonServer individualTextureSyphonServer;
+    
+//        ofxSyphonClient mClient;
     
         ofxJSONElement json;
     
@@ -73,9 +56,7 @@ class ofApp : public ofBaseApp{
 		void update();
 		void draw();
         void exit();
-    
-        void stripePattern();
-        void matrixPattern();
+
         void draw2d();
         void draw3d();
     
