@@ -32,9 +32,9 @@
 	<show2d>0</show2d>
 		<show3d>255</show3d>
 	<rad>2</rad>
-		<deform>0.0306189</deform>
-		<deformFreq>7.9047</deformFreq>
-		<extrude>53.1293</extrude>
+		<deform>0.0475832</deform>
+		<deformFreq>7.10843</deformFreq>
+		<extrude>85.7485</extrude>
 	<automate>1</automate>
 	</Mixer>
 </Parameters>

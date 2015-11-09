@@ -79,7 +79,7 @@ void ofApp::update(){
     if ( firstTime || ofGetElapsedTimef() - prevTime > interval ) {
         ofLogNotice("time") << ofGetElapsedTimef();
         
-        bool parsingSuccessful = json.open("test.json");
+        bool parsingSuccessful = json.open(url);
         
         if (parsingSuccessful) {
             ofLogNotice("ofApp::setup") << json.getRawString(true);
@@ -156,7 +156,7 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     ofBackground( Background );
-    ofSetColor(255, 255, 255);
+//    ofSetColor(255, 255, 255);
 //    kinect.draw(0, 0, ofGetWidth(), ofGetHeight());
 //    draw3d();
     
@@ -178,15 +178,15 @@ void ofApp::draw(){
     
 //    ofSetColor( 255, show2d );
 //    fbo2.draw( 0, 0 );
-    
+//    
     ofSetColor( 255, show3d );
     fbo3d.draw( 0, 0, ofGetWidth(), ofGetHeight() );
     
-    ofSetColor( 255 );
-    ofDrawBitmapString( ofToString( ofGetFrameRate() ), 250, 20 );
+//    ofSetColor( 255 );
+//    ofDrawBitmapString( ofToString( ofGetFrameRate() ), 250, 20 );
     
     // json test
-    ofSetColor(255);
+//    ofSetColor(255);
 //    string temp = ofToString(json["main"]["temp"].asFloat());
 //    string pressure = ofToString(json["main"]["pressure"].asFloat());
 //    string humidity = ofToString(json["main"]["humidity"].asInt());
