@@ -2,7 +2,7 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    showGui = true;
+    showGui = false;
     showfullScreen = false;
     int screenWidth = 1920;
     int screenHeight = 1080;
@@ -24,7 +24,6 @@ void ofApp::setup(){
     mixerGroup.setHeaderBackgroundColor( ofColor::darkRed );
     mixerGroup.setBorderColor( ofColor::darkRed );
     mixerGroup.add( videoAlpha.setup( "video", 200,0,255 ) );
-//    mixerGroup.add( cameraAlpha.setup( "camera", 100,0,255 ) );
     mixerGroup.add( show2d.setup("show2d", 255, 0, 255) );
     mixerGroup.add( show3d.setup("show3d", 255, 0, 255) );
     mixerGroup.add( rad.setup("rad", 1, 1, 7) );
@@ -60,43 +59,47 @@ void ofApp::setup(){
     kinect.open();
     
     if(kinect.isConnected()) {
-        ofLogNotice() << "sensor-emitter dist: " << kinect.getSensorEmitterDistance() << "cm";
-        ofLogNotice() << "sensor-camera dist:  " << kinect.getSensorCameraDistance() << "cm";
-        ofLogNotice() << "zero plane pixel size: " << kinect.getZeroPlanePixelSize() << "mm";
-        ofLogNotice() << "zero plane dist: " << kinect.getZeroPlaneDistance() << "mm";
+        ofLogNotice() << "kinect connected";
     }
     
-//    colorImg.allocate(kinect.width, kinect.height);
-//    grayImage.allocate(kinect.width, kinect.height);
-//    grayThreshNear.allocate(kinect.width, kinect.height);
-//    grayThreshFar.allocate(kinect.width, kinect.height);
-    
-    nearThreshold = 230;
-    farThreshold = 70;
-//    bThreshWithOpenCV = true;
     angle = 0;
     kinect.setCameraTiltAngle(angle);
     
-    
-    // *** video plane ***
-    
     // *** weather api ***
-//    string url = "http://api.openweathermap.org/data/2.5/weather?id=5110302&units=metric&APPID=80b894b8014884a432cb5bea1fe2c422";
-//    // Now parse the JSON
-//    bool parsingSuccessful = json.open(url);
-//    if (parsingSuccessful)
-//    {
-//        ofLogNotice("ofApp::setup") << json.getRawString(true);
-//    } else {
-//        ofLogNotice("ofApp::setup") << "Failed to parse JSON.";
-//    }
-    
+    url = "http://api.openweathermap.org/data/2.5/weather?id=5110302&units=metric&APPID=80b894b8014884a432cb5bea1fe2c422";
+    prevTime = 0;
+    interval = 900; // 900 - 15mins
+    fileNum = 1;
+    firstTime = true;
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-//    video.update();
-//    if ( camera.isInitialized() ) camera.update();
+    // *** weather data update every 15 minutes ***
+    if ( firstTime || ofGetElapsedTimef() - prevTime > interval ) {
+        ofLogNotice("time") << ofGetElapsedTimef();
+        
+        bool parsingSuccessful = json.open("test.json");
+        
+        if (parsingSuccessful) {
+            ofLogNotice("ofApp::setup") << json.getRawString(true);
+        } else {
+            ofLogNotice("ofApp::setup") << "Failed to parse JSON.";
+        }
+        
+        // now write pretty print
+        string fileName = "weatherData" + ofToString(fileNum) + ".json";
+        if (!json.save(fileName, true)) {
+            ofLogNotice("ofApp::setup") << fileName  << " written unsuccessfully.";
+        } else {
+            ofLogNotice("ofApp::setup") << fileName << " written successfully.";
+        }
+        
+        firstTime = false;
+        fileNum++;
+        prevTime = ofGetElapsedTimef();
+    }
+    
     
     vector<ofPoint> &vertices = videoPlane.getMesh().getVertices();
 //    for (int i=0; i<vertices.size(); i++) {
@@ -147,26 +150,7 @@ void ofApp::update(){
     
     // *** kinect ***
     kinect.update();
-//    if(kinect.isFrameNew()) {
-//        
-//        // load grayscale depth image from the kinect source
-//        grayImage.setFromPixels(kinect.getDepthPixels(), kinect.width, kinect.height);
-//        
-//        // we do two thresholds - one for the far plane and one for the near plane
-//        // we then do a cvAnd to get the pixels which are a union of the two thresholds
-//        grayThreshNear = grayImage;
-//        grayThreshFar = grayImage;
-//        grayThreshNear.threshold(nearThreshold, true);
-//        grayThreshFar.threshold(farThreshold);
-//        cvAnd(grayThreshNear.getCvImage(), grayThreshFar.getCvImage(), grayImage.getCvImage(), NULL);
-//        
-//        // update the cv images
-//        grayImage.flagImageChanged();
-//        
-//        // find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
-//        // also, find holes is set to true so we will get interior contours as well....
-////        contourFinder.findContours(grayImage, 10, (kinect.width*kinect.height)/2, 20, false);
-//    }
+
 }
 
 //--------------------------------------------------------------
@@ -202,7 +186,7 @@ void ofApp::draw(){
     ofDrawBitmapString( ofToString( ofGetFrameRate() ), 250, 20 );
     
     // json test
-//    ofSetColor(255);
+    ofSetColor(255);
 //    string temp = ofToString(json["main"]["temp"].asFloat());
 //    string pressure = ofToString(json["main"]["pressure"].asFloat());
 //    string humidity = ofToString(json["main"]["humidity"].asInt());

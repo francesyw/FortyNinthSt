@@ -48,21 +48,14 @@ class ofApp : public ofBaseApp{
         ofxToggle automate;
     
         ofxJSONElement json;
-    
+        string url;
+        float prevTime;
+        float interval;
+        int fileNum;
+        bool firstTime;
     
         // *** kinect ***
         ofxKinect kinect;
-    
-        ofxCvColorImage colorImg;
-        
-        ofxCvGrayscaleImage grayImage; // grayscale depth image
-        ofxCvGrayscaleImage grayThreshNear; // the near thresholded image
-        ofxCvGrayscaleImage grayThreshFar; // the far thresholded image
-        
-        ofxCvContourFinder contourFinder;
-        
-//        bool bThreshWithOpenCV;
-//        bool bDrawPointCloud;
     
         int nearThreshold;
         int farThreshold;
