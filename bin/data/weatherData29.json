@@ -1,0 +1,42 @@
+{
+   "base" : "cmc stations",
+   "clouds" : {
+      "all" : 0
+   },
+   "cod" : 200,
+   "coord" : {
+      "lat" : 40.65,
+      "lon" : -73.95
+   },
+   "dt" : 1447085939,
+   "id" : 5110302,
+   "main" : {
+      "grnd_level" : 1041.28,
+      "humidity" : 70,
+      "pressure" : 1041.28,
+      "sea_level" : 1045.16,
+      "temp" : 12.16,
+      "temp_max" : 12.16,
+      "temp_min" : 12.16
+   },
+   "name" : "Brooklyn",
+   "sys" : {
+      "country" : "US",
+      "message" : 0.0049,
+      "sunrise" : 1447068952,
+      "sunset" : 1447105376
+   },
+   "weather" : [
+      {
+         "description" : "Sky is Clear",
+         "icon" : "01d",
+         "id" : 800,
+         "main" : "Clear"
+      }
+   ],
+   "wind" : {
+      "deg" : 246.503,
+      "speed" : 1.6
+   }
+}
+

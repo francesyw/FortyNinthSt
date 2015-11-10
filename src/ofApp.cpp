@@ -69,8 +69,8 @@ void ofApp::setup(){
     url = "http://api.openweathermap.org/data/2.5/weather?id=5110302&units=metric&APPID=80b894b8014884a432cb5bea1fe2c422";
     prevTime = 0;
     interval = 900; // 900 - 15mins
-    fileNum = 1;
-    firstTime = true;
+    fileNum = 46;
+    firstTime = false;
 }
 
 //--------------------------------------------------------------
@@ -141,7 +141,7 @@ void ofApp::update(){
         double level = 0;
         level += (soundLevel*2);
 //        cout << level << endl;
-        float newExtrude = ofMap(level, 0, 0.3, 50, 300, true);
+        float newExtrude = ofMap(level, 0, 0.5, 10, 300, true);
         extrude = extrude + 0.1 * (newExtrude-extrude);
 //        float newRad = ofMap( level, 0, 0.02, 1, 7, true );
 //        rad = floor(rad + 0.3 * (newRad-rad));
