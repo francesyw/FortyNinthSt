@@ -1,8 +1,5 @@
 #include "ofApp.h"
 
-int W = 100;		//Grid size
-int H = 100;
-
 //--------------------------------------------------------------
 void ofApp::setup(){
     showGui = true;
@@ -42,8 +39,8 @@ void ofApp::setup(){
     mixerGroup.setup( "Mixer" );
     mixerGroup.setHeaderBackgroundColor( ofColor::darkRed );
     mixerGroup.setBorderColor( ofColor::darkRed );
-    mixerGroup.add( imageAlpha.setup( "image", 100,0,255 ) );
-    mixerGroup.add( videoAlpha.setup( "video", 200,0,255 ) );
+//    mixerGroup.add( imageAlpha.setup( "image", 100,0,255 ) );
+//    mixerGroup.add( videoAlpha.setup( "video", 200,0,255 ) );
 //    mixerGroup.add( cameraAlpha.setup( "camera", 100,0,255 ) );
     shader.load( "kaleido" );
     mixerGroup.add( kenabled.setup( "kenabled", true ) );
@@ -63,31 +60,25 @@ void ofApp::setup(){
     
     gui.loadFromFile( "settings.xml" );
     
-    ofLoadImage( image, "collage.png" );
+//    ofLoadImage( image, "collage.png" );
 //    video.loadMovie( "flowing.mp4" );
 //    video.play();
     
     fbo.allocate( screenWidth, screenHeight, GL_RGB );
     
-    videoPlane.set(screenWidth, screenHeight);
-    videoPlane.setResolution(100, 100);
-    vertices0 = videoPlane.getMesh().getVertices();
+//    videoPlane.set(screenWidth, screenHeight);
+//    videoPlane.setResolution(100, 100);
+//    vertices0 = videoPlane.getMesh().getVertices();
     fbo2.allocate( screenWidth, screenHeight, GL_RGB );
-    float w = fbo2.getWidth();
-    float h = fbo2.getHeight();
-    videoPlane.mapTexCoords(0, h, w, 0);
-    videoPlane.rotate(0, 0, 1, 0);
+//    float w = fbo2.getWidth();
+//    float h = fbo2.getHeight();
+//    videoPlane.mapTexCoords(0, h, w, 0);
+//    videoPlane.rotate(0, 0, 1, 0);
     
     fbo3d.allocate( screenWidth, screenHeight, GL_RGBA );
     
-    soundLevel = 0;
-    ofSoundStreamSetup( 0, 1, 44100, 128, 4 );
-    
-    // *** syphon ***
-    mClient.setup();
-    mClient.set("","EpocCam Viewer Pro");
-    
-    // *** video plane ***
+//    soundLevel = 0;
+//    ofSoundStreamSetup( 0, 1, 44100, 128, 4 );
     
     // *** weather api ***
 //    string url = "http://api.openweathermap.org/data/2.5/weather?id=5110302&units=metric&APPID=80b894b8014884a432cb5bea1fe2c422";
@@ -104,8 +95,6 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-//    video.update();
-//    if ( camera.isInitialized() ) camera.update();
     
     vector<ofPoint> &vertices = videoPlane.getMesh().getVertices();
 //    for (int i=0; i<vertices.size(); i++) {
@@ -174,19 +163,19 @@ void ofApp::draw(){
     if ( kenabled ) shader.end();
     fbo2.end();
     
-    fbo3d.begin();
-    ofBackground( 0, 0 );
-    draw3d();
-    fbo3d.end();
+//    fbo3d.begin();
+//    ofBackground( 0, 0 );
+//    draw3d();
+//    fbo3d.end();
     
     ofBackground( 0 );
     ofSetColor( 255, show2d );
     fbo2.draw( 0, 0 );
-    ofSetColor( 255, show3d );
-    fbo3d.draw( 0, 0 );
+//    ofSetColor( 255, show3d );
+//    fbo3d.draw( 0, 0 );
     
-//    ofSetColor( 255 );
-//    ofDrawBitmapString( ofToString( ofGetFrameRate() ), 250, 20 );
+    ofSetColor( 255 );
+    ofDrawBitmapString( ofToString( ofGetFrameRate() ), 250, 20 );
     
     // json test
 //    ofSetColor(255);
@@ -256,14 +245,7 @@ void ofApp::draw2d() {
     
     ofDisableSmoothing();
     ofEnableBlendMode( OF_BLENDMODE_ADD );
-    ofSetColor( 255, imageAlpha );
-    image.draw( 0, 0, ofGetWidth(), ofGetHeight() );
-    ofSetColor( 255, videoAlpha );
-    mClient.draw( 0, 0, ofGetWidth(), ofGetHeight() );
-//    if ( camera.isInitialized() ) {
-//        ofSetColor( 255, cameraAlpha );
-//        camera.draw( 0, 0, ofGetWidth(), ofGetHeight() );
-//    }
+
     ofEnableAlphaBlending();
     ofEnableSmoothing();
     
@@ -311,16 +293,6 @@ void ofApp::draw3d() {
     fbo2.getTextureReference().unbind();
 }
 
-//**************************************************************
-void ofApp::audioIn(float *input, int bufferSize, int nChannels){
-    double v = 0;
-    for (int i=0; i<bufferSize; i++) {
-        v += input[i] * input[i];
-    }
-    v = sqrt( v / bufferSize );
-    soundLevel = v;
-}
-
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
@@ -342,11 +314,6 @@ void ofApp::keyPressed(int key){
         res = ofSystemLoadDialog( "Loading Preset" );
         if ( res.bSuccess ) gui.loadFromFile( res.filePath );
     }
-//    if ( key == 'c' ) {
-//        camera.setDeviceID( 0 );
-//        camera.setDesiredFrameRate( 30 );
-//        camera.initGrabber( 1280, 720 );
-//    }
 }
 
 //--------------------------------------------------------------
