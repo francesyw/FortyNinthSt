@@ -39,9 +39,6 @@ void ofApp::setup(){
     mixerGroup.setup( "Mixer" );
     mixerGroup.setHeaderBackgroundColor( ofColor::darkRed );
     mixerGroup.setBorderColor( ofColor::darkRed );
-//    mixerGroup.add( imageAlpha.setup( "image", 100,0,255 ) );
-//    mixerGroup.add( videoAlpha.setup( "video", 200,0,255 ) );
-//    mixerGroup.add( cameraAlpha.setup( "camera", 100,0,255 ) );
     shader.load( "kaleido" );
     mixerGroup.add( kenabled.setup( "kenabled", true ) );
     mixerGroup.add( ksectors.setup( "ksectors", 10, 1, 100 ) );
@@ -60,10 +57,6 @@ void ofApp::setup(){
     
     gui.loadFromFile( "settings.xml" );
     
-//    ofLoadImage( image, "collage.png" );
-//    video.loadMovie( "flowing.mp4" );
-//    video.play();
-    
     fbo.allocate( screenWidth, screenHeight, GL_RGB );
     
 //    videoPlane.set(screenWidth, screenHeight);
@@ -77,26 +70,34 @@ void ofApp::setup(){
     
     fbo3d.allocate( screenWidth, screenHeight, GL_RGBA );
     
-//    soundLevel = 0;
-//    ofSoundStreamSetup( 0, 1, 44100, 128, 4 );
-    
     // *** weather api ***
-//    string url = "http://api.openweathermap.org/data/2.5/weather?id=5110302&units=metric&APPID=80b894b8014884a432cb5bea1fe2c422";
-//    // Now parse the JSON
-//    bool parsingSuccessful = json.open(url);
-//    if (parsingSuccessful)
-//    {
-//        ofLogNotice("ofApp::setup") << json.getRawString(true);
-//    } else {
-//        ofLogNotice("ofApp::setup") << "Failed to parse JSON.";
+    for (int i = 1; i <= 45; i++) {
+        string fileName = "weatherData" + ofToString(i) + ".json";
+        bool parsingSuccessful = json.open(fileName);
+        if (parsingSuccessful)
+        {
+            json.getRawString(true);
+            temp[i-1] = json["main"]["temp"].asFloat();
+            pressure[i-1] = json["main"]["pressure"].asFloat();
+            humidity[i-1] = json["main"]["humidity"].asInt();
+            windSpeed[i-1] = json["wind"]["speed"].asFloat();
+            windDeg[i-1] = json["wind"]["deg"].asFloat();
+        } else {
+            ofLogNotice("ofApp::setup") << "Failed to parse file " << fileName;
+        }
+
+    }
+//    for (int i = 0; i < 45; i++) {
+//        ofLogNotice("ofApp::setup") << "(" << i+1 << ") "<< windDeg[i];
 //    }
+
     
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     
-    vector<ofPoint> &vertices = videoPlane.getMesh().getVertices();
+//    vector<ofPoint> &vertices = videoPlane.getMesh().getVertices();
 //    for (int i=0; i<vertices.size(); i++) {
 //        ofPoint v = vertices0[i];
 //        v.normalize();
@@ -110,15 +111,15 @@ void ofApp::update(){
 //        vertices[i] = v;
 //    }
     
-    ofPixels pixels;
-    fbo2.readToPixels(pixels);
-    for (int i=0; i<vertices.size(); i++) {
-        ofVec2f t = videoPlane.getMesh().getTexCoords()[i];
-        t.x = ofClamp( t.x, 0, pixels.getWidth()-1 );
-        t.y = ofClamp( t.y, 0, pixels.getHeight()-1 );
-        float br = pixels.getColor(t.x, t.y).getBrightness();
-        vertices[i] = vertices0[i] + br / 255.0 * extrude;
-    }
+//    ofPixels pixels;
+//    fbo2.readToPixels(pixels);
+//    for (int i=0; i<vertices.size(); i++) {
+//        ofVec2f t = videoPlane.getMesh().getTexCoords()[i];
+//        t.x = ofClamp( t.x, 0, pixels.getWidth()-1 );
+//        t.y = ofClamp( t.y, 0, pixels.getHeight()-1 );
+//        float br = pixels.getColor(t.x, t.y).getBrightness();
+//        vertices[i] = vertices0[i] + br / 255.0 * extrude;
+//    }
     
     if ( automate ) {
         /* automation */
@@ -133,11 +134,8 @@ void ofApp::update(){
         deformFreq = ofMap(ofNoise( phase1, 33.3 ), 0, 1, 5, 10);
         
 
-        double level = 0;
-        level += (soundLevel*2);
-//        cout << level << endl;
-        float newExtrude = ofMap(level, 0, 0.3, 50, 300, true);
-        extrude = extrude + 0.1 * (newExtrude-extrude);
+//        float newExtrude = ofMap(level, 0, 0.3, 50, 300, true);
+//        extrude = extrude + 0.1 * (newExtrude-extrude);
 //        float newRad = ofMap( level, 0, 1, 100, 300, true );
 //        rad = rad + 0.5 * (newRad-rad);
         
@@ -174,21 +172,9 @@ void ofApp::draw(){
 //    ofSetColor( 255, show3d );
 //    fbo3d.draw( 0, 0 );
     
+    // frameRate
     ofSetColor( 255 );
     ofDrawBitmapString( ofToString( ofGetFrameRate() ), 250, 20 );
-    
-    // json test
-//    ofSetColor(255);
-//    string temp = ofToString(json["main"]["temp"].asFloat());
-//    string pressure = ofToString(json["main"]["pressure"].asFloat());
-//    string humidity = ofToString(json["main"]["humidity"].asInt());
-//    string windSpeed = ofToString(json["wind"]["speed"].asFloat());
-//    string windDeg =  ofToString(json["wind"]["deg"].asFloat());
-//    string weatherMain =  json["weather"][0]["main"].asString();
-//    string text = "temp: " + temp + "\n" + "pressure: " + pressure + "\n" + "humidity: " + humidity + "\n" +
-//                  "wind speed: " + windSpeed + " | " + "wind degree: " + windDeg + "\n" + "weather: " + weatherMain;
-//    ofDrawBitmapString(text, 100, 100);
-
     
     if ( showGui ) gui.draw();
 }

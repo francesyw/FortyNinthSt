@@ -2,7 +2,6 @@
 
 #include "ofMain.h"
 #include "ofxGui.h"
-#include "ofxSyphon.h"
 #include "ofxJSON.h"
 
 class ofApp : public ofBaseApp{
@@ -28,12 +27,7 @@ class ofApp : public ofBaseApp{
         ofxColorSlider color;
         ofxToggle filled, type;
     
-        ofTexture image;
-        ofVideoPlayer video;
-//        ofVideoGrabber camera;
-    
         ofxGuiGroup mixerGroup;
-        ofxFloatSlider imageAlpha, videoAlpha; //, cameraAlpha;
         ofxToggle kenabled;
         ofxIntSlider ksectors;
         ofxFloatSlider kangle, kx, ky;
@@ -41,7 +35,6 @@ class ofApp : public ofBaseApp{
         ofFbo fbo;
         ofShader shader;
     
-//        ofSpherePrimitive sphere;
         ofPlanePrimitive videoPlane;
         ofEasyCam cam;
         ofLight light;
@@ -57,17 +50,14 @@ class ofApp : public ofBaseApp{
         float phase = 0;
         float frequency = 0.1;
     
-        void audioIn(float *input, int bufferSize, int nChannels);
-        float soundLevel;
-    
         ofxToggle automate;
-        
-        ofxSyphonServer mainOutputSyphonServer;
-        ofxSyphonServer individualTextureSyphonServer;
-        
-        ofxSyphonClient mClient;
     
         ofxJSONElement json;
+        float temp[45];
+        float pressure[45];
+        float humidity[45];
+        float windSpeed[45];
+        float windDeg[45];
     
         void setup();
 		void update();
